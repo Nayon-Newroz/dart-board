@@ -78,19 +78,19 @@ const Board = () => {
   };
   const addPoint = () => {
     console.log("addPoint");
-    playerData.points.push(parseInt(playerPoint));
-    myRemaningPoint(playerData.points);
-    console.log("...playerData.points", ...playerData.points);
-    // add in gametable players point
-    let newPlayers = [];
-
-    gameTable.players?.map((item, i) => {
-      if (item.id === playerData.id) {
-        item.points = [...playerData.points];
-      }
-    });
-    setRefresh(!refresh);
-    setPlayerPoint("");
+    if (playerPoint.length > 0) {
+      playerData.points.push(parseInt(playerPoint));
+      myRemaningPoint(playerData.points);
+      console.log("...playerData.points", ...playerData.points);
+      // add in gametable players point
+      gameTable.players?.map((item, i) => {
+        if (item.id === playerData.id) {
+          item.points = [...playerData.points];
+        }
+      });
+      setRefresh(!refresh);
+      setPlayerPoint("");
+    }
   };
   const deletePoint = (point, indexNo) => {
     console.log("point", point, "ïndex", indexNo);
@@ -124,6 +124,16 @@ const Board = () => {
     let newGame = { ...gameTable, gameName, gamePoint };
     setGameTable(newGame);
     setStartForm(false);
+    // =========================================
+
+    let newplayerData = gameTable?.players[0];
+    setPlayerId(newplayerData.id);
+
+    myRemaningPoint(newplayerData.points);
+    console.log("newplayerData", newplayerData);
+    console.log("playerData.id", playerData.id);
+
+    setPlayerData(newplayerData);
   };
   const myRemaningPoint = (points) => {
     console.log("points", points);
@@ -244,19 +254,51 @@ const Board = () => {
               "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px",
           }}
         >
+          <div style={{ textAlign: "right" }}>
+            <Button
+              disableElevation
+              variant="outlined"
+              color="secondary"
+              onClick={() => {
+                localStorage.setItem(
+                  `${gameTable?.gameName}`,
+                  JSON.stringify(gameTable)
+                );
+              }}
+            >
+              Save Score
+            </Button>
+            &nbsp; &nbsp;
+            <Button
+              disableElevation
+              variant="outlined"
+              // color="secondary"
+              onClick={() => {
+                let retrievedObject = localStorage.getItem(
+                  `${gameTable?.gameName}`
+                );
+
+                console.log("retrievedObject: ", JSON.parse(retrievedObject));
+              }}
+            >
+              Load Score
+            </Button>
+            <br />
+            <br />
+          </div>
           <Grid container alignItems="center">
             <Grid item xs={6}>
-              <h2 style={{ marginTop: 0 }} onClick={check}>
+              <h3 style={{ marginTop: 0 }} onClick={check}>
                 {gameTable?.gameName}
-              </h2>
+              </h3>
             </Grid>
             <Grid item xs={6}>
-              <h2
+              <h3
                 style={{ marginTop: 0, textAlign: "right", color: "#9b9b9b" }}
                 onClick={check}
               >
                 Game Point : {gameTable?.gamePoint}
-              </h2>
+              </h3>
             </Grid>
           </Grid>
 
@@ -276,23 +318,20 @@ const Board = () => {
               ))}
             </Select>
           </FormControl>
-          {/* <h2 style={{ marginTop: 0, textAlign: "center" }} onClick={check}>
-            Game Point {gameTable?.gamePoint}
-          </h2> */}
 
           <Grid container alignItems="center">
             <Grid item xs={6}>
-              <h3 style={{ marginTop: 0, color: "#9b9b9b" }} onClick={check}>
+              <h4 style={{ marginTop: 0, color: "#9b9b9b" }} onClick={check}>
                 Total Point : {totalPoint}
-              </h3>
+              </h4>
             </Grid>
             <Grid item xs={6}>
-              <h3
+              <h4
                 style={{ marginTop: 0, textAlign: "right", color: "#9b9b9b" }}
                 onClick={check}
               >
                 Remaining Point : {remainingPoint}
-              </h3>
+              </h4>
             </Grid>
           </Grid>
 
