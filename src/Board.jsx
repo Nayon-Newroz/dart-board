@@ -109,6 +109,14 @@ const Board = () => {
     setRefresh(!refresh);
     setPlayerPoint("");
   };
+  const deletePlayer = (point, indexNo) => {
+    console.log("point", point, "ïndex", indexNo);
+
+    let newPlayers = gameTable.players.filter((item, i) => i !== indexNo);
+    setGameTable({ ...gameTable, players: newPlayers });
+
+    setRefresh(!refresh);
+  };
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -165,9 +173,9 @@ const Board = () => {
               "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px",
           }}
         >
-          {/* <h2 style={{ marginTop: 0 }} onClick={check}>
+          <h2 style={{ marginTop: 0 }} onClick={check}>
             Dart
-          </h2> */}
+          </h2>
           {gameNameError && (
             <p style={{ color: "red", marginTop: 0 }}>Please enter game name</p>
           )}
@@ -227,11 +235,43 @@ const Board = () => {
               onChange={(e) => setPlayerName(e.target.value)}
             />
           </FormControl>
-          <ul>
+          {/* <ul>
             {gameTable?.players?.map((item, i) => (
               <li key={i}>{item.name}</li>
             ))}
-          </ul>
+          </ul> */}
+          {gameTable?.players.length > 0 && (
+            <h3 style={{ marginTop: 0, color: "#9b9b9b" }} onClick={check}>
+              Players
+            </h3>
+          )}
+
+          <Table
+            aria-label="simple table"
+            size="small"
+            style={{ border: "1px solid #ddd", marginBottom: "20px" }}
+          >
+            <TableBody>
+              {gameTable?.players?.map((item, i) => (
+                <TableRow
+                  key={i}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell style={{ fontSize: "18px", fontWeight: "bold" }}>
+                    {item.name}
+                  </TableCell>
+                  <TableCell align="right">
+                    {/* <IconButton>
+                      <ModeEditOutlineOutlinedIcon />
+                    </IconButton> */}
+                    <IconButton onClick={() => deletePlayer(item, i)}>
+                      <DeleteOutlineOutlinedIcon color="error" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
           <Button
             fullWidth
             variant="contained"
@@ -372,15 +412,6 @@ const Board = () => {
             size="small"
             style={{ border: "1px solid #ddd" }}
           >
-            {/* <TableHead>
-          <TableRow>
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
-          </TableRow>
-        </TableHead> */}
             <TableBody>
               {playerData?.points?.map((item, i) => (
                 <TableRow
@@ -402,55 +433,6 @@ const Board = () => {
               ))}
             </TableBody>
           </Table>
-          {/* <TextField
-            style={{ marginBottom: "20px" }}
-            id="outlined-basic"
-            type="number"
-            label="Game Point"
-            variant="outlined"
-            //   size="small"
-            fullWidth
-            value={gamePoint}
-            onChange={(e) => setGamePoint(e.target.value)}
-          /> */}
-
-          {/* <FormControl
-            variant="outlined"
-            fullWidth
-            style={{ marginBottom: "20px" }}
-          >
-            <InputLabel htmlFor="outlined-adornment-password">
-              Player Name
-            </InputLabel>
-            <OutlinedInput
-              id="outlined-adornment-password"
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    style={{ background: "green" }}
-                    aria-label="toggle password visibility"
-                    onClick={addPlayer}
-                    onMouseDown={handleMouseDownPassword}
-                    edge="end"
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </InputAdornment>
-              }
-              label="Player Name"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-            />
-          </FormControl> */}
-          {/* <ul>
-            {gameTable?.players?.map((item, i) => (
-              <li key={i}>{item.name}</li>
-            ))}
-          </ul> */}
-          {/* <Button fullWidth variant="contained" onClick={startGame}>
-            {" "}
-            Start
-          </Button> */}
         </div>
       )}
     </div>
