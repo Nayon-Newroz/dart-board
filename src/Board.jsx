@@ -182,7 +182,28 @@ const Board = () => {
     setRemainingPoint(remainingPoints);
     // return remainingPoints;
   };
+  const fnSetNewGame = () => {
+    // setGameName(gameTable?.gameName);
+    // setGamePoint(gameTable?.gamePoint);
+    let newPlayers = [];
+    console.log("gameTable?.players", gameTable?.players);
+    gameTable?.players?.map((item) => {
+      newPlayers.push({
+        id: uuidv4(),
+        name: item.name.trim(),
+        points: [],
+      });
+    });
+    setGameTable({
+      gameName: gameTable?.gameName,
+      gamePoint: gameTable?.gamePoint,
+      players: newPlayers,
+    });
+    console.log("newPlayers", newPlayers);
 
+    setPlayerName("");
+    setStartForm(true);
+  };
   const check = () => {
     console.log("gameTable", gameTable);
   };
@@ -322,6 +343,15 @@ const Board = () => {
           }}
         >
           <div style={{ textAlign: "right" }}>
+            <Button
+              disableElevation
+              variant="outlined"
+              color="info"
+              onClick={fnSetNewGame}
+            >
+              New Game
+            </Button>
+            &nbsp; &nbsp;
             <Button
               disableElevation
               variant="outlined"
