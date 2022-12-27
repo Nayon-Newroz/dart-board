@@ -24,6 +24,11 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormLabel from "@mui/material/FormLabel";
+import { useSnackbar } from "notistack";
 const Board = () => {
   const [gameName, setGameName] = useState("");
   const [gamePoint, setGamePoint] = useState(101);
@@ -53,6 +58,21 @@ const Board = () => {
       // },
     ],
   });
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleSnakbarOpen = (msg, vrnt) => {
+    let duration;
+    if (vrnt === "error") {
+      duration = 3000;
+    } else {
+      duration = 1000;
+    }
+    enqueueSnackbar(msg, {
+      variant: vrnt,
+      autoHideDuration: duration,
+    });
+  };
   const handleChange = (event) => {
     setPlayerId(event.target.value);
     let newplayerData = gameTable?.players?.find(
@@ -78,6 +98,13 @@ const Board = () => {
   };
   const addPoint = () => {
     console.log("addPoint");
+    console.log("remainingPoint", remainingPoint);
+    if (remainingPoint < parseInt(playerPoint)) {
+      return handleSnakbarOpen(
+        "your point is bigger than remaining point",
+        "error"
+      );
+    }
     if (playerPoint.length > 0) {
       playerData.points.push(parseInt(playerPoint));
       myRemaningPoint(playerData.points);
@@ -328,7 +355,7 @@ const Board = () => {
           </div>
           <Grid container alignItems="center">
             <Grid item xs={6}>
-              <h3 style={{ marginTop: 0 }} onClick={check}>
+              <h3 style={{ marginTop: 0, color: "#1A5276" }} onClick={check}>
                 {gameTable?.gameName}
               </h3>
             </Grid>
@@ -342,7 +369,7 @@ const Board = () => {
             </Grid>
           </Grid>
 
-          <FormControl fullWidth style={{ marginBottom: "20px" }}>
+          {/* <FormControl fullWidth style={{ marginBottom: "20px" }}>
             <InputLabel id="demo-simple-select-label">Player</InputLabel>
             <Select
               labelId="demo-simple-select-label"
@@ -357,6 +384,27 @@ const Board = () => {
                 </MenuItem>
               ))}
             </Select>
+          </FormControl> */}
+          <FormControl>
+            <FormLabel id="demo-row-radio-buttons-group-label">
+              Players
+            </FormLabel>
+            <RadioGroup
+              row
+              aria-labelledby="demo-row-radio-buttons-group-label"
+              name="row-radio-buttons-group"
+              value={playerId}
+              onChange={handleChange}
+            >
+              {gameTable?.players?.map((item, i) => (
+                <FormControlLabel
+                  key={i}
+                  value={item.id}
+                  control={<Radio />}
+                  label={item.name}
+                />
+              ))}
+            </RadioGroup>
           </FormControl>
 
           <Grid container alignItems="center">
@@ -370,7 +418,8 @@ const Board = () => {
                 style={{ marginTop: 0, textAlign: "right", color: "#9b9b9b" }}
                 onClick={check}
               >
-                Remaining Point : {remainingPoint}
+                Remaining Point :{" "}
+                <span style={{ color: "#1A5276" }}>{remainingPoint}</span>
               </h4>
             </Grid>
           </Grid>
