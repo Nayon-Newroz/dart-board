@@ -348,14 +348,16 @@ const Board = () => {
               variant="outlined"
               color="info"
               onClick={fnSetNewGame}
+              size="small"
             >
               New Game
             </Button>
-            &nbsp; &nbsp;
+            {/* &nbsp; &nbsp;
             <Button
               disableElevation
               variant="outlined"
               color="secondary"
+              size="small"
               onClick={() => {
                 localStorage.setItem(
                   `${gameTable?.gameName}`,
@@ -368,8 +370,8 @@ const Board = () => {
             &nbsp; &nbsp;
             <Button
               disableElevation
-              variant="outlined"
-              // color="secondary"
+              variant="outlined" 
+              size="small"
               onClick={() => {
                 let retrievedObject = localStorage.getItem(
                   `${gameTable?.gameName}`
@@ -379,7 +381,7 @@ const Board = () => {
               }}
             >
               Load Score
-            </Button>
+            </Button> */}
             <br />
             <br />
           </div>
