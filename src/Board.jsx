@@ -29,6 +29,18 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
 import { useSnackbar } from "notistack";
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import MailIcon from "@mui/icons-material/Mail";
+import DataUsageIcon from "@mui/icons-material/DataUsage";
+import MenuIcon from "@mui/icons-material/Menu";
 const Board = () => {
   const [gameName, setGameName] = useState("");
   const [gamePoint, setGamePoint] = useState(101);
@@ -45,21 +57,27 @@ const Board = () => {
   const [gameTable, setGameTable] = useState({
     gameName: "",
     gamePoint: 101,
-    players: [
-      // {
-      //   id: "asdfas",
-      //   name: "Player 1",
-      //   points: [15, 35],
-      // },
-      // {
-      //   id: "erwwer",
-      //   name: "Player 2",
-      //   points: [10, 20],
-      // },
-    ],
+    players: [],
   });
 
   const { enqueueSnackbar } = useSnackbar();
+  const [state, setState] = React.useState({
+    top: false,
+    left: false,
+    bottom: false,
+    right: false,
+  });
+
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+
+    setState({ ...state, [anchor]: open });
+  };
 
   const handleSnakbarOpen = (msg, vrnt) => {
     let duration;
@@ -118,6 +136,7 @@ const Board = () => {
       setRefresh(!refresh);
       setPlayerPoint("");
     }
+    saveGame();
   };
   const deletePoint = (point, indexNo) => {
     console.log("point", point, "ïndex", indexNo);
@@ -135,6 +154,7 @@ const Board = () => {
     });
     setRefresh(!refresh);
     setPlayerPoint("");
+    saveGame();
   };
   const deletePlayer = (point, indexNo) => {
     console.log("point", point, "ïndex", indexNo);
@@ -165,13 +185,11 @@ const Board = () => {
     setPlayerId(newplayerData.id);
 
     myRemaningPoint(newplayerData.points);
-    console.log("newplayerData", newplayerData);
-    console.log("playerData.id", playerData.id);
 
     setPlayerData(newplayerData);
+    saveGame();
   };
   const myRemaningPoint = (points) => {
-    console.log("points", points);
     let myPoint = 0;
     points?.map((item) => {
       myPoint = myPoint + item;
@@ -183,8 +201,6 @@ const Board = () => {
     // return remainingPoints;
   };
   const fnSetNewGame = () => {
-    // setGameName(gameTable?.gameName);
-    // setGamePoint(gameTable?.gamePoint);
     let newPlayers = [];
     console.log("gameTable?.players", gameTable?.players);
     gameTable?.players?.map((item) => {
@@ -205,8 +221,56 @@ const Board = () => {
     setStartForm(true);
   };
   const check = () => {
-    console.log("gameTable", gameTable);
+    // console.log("gameTable", gameTable);
+    loadPreviousGame();
   };
+  const saveGame = () => {
+    console.log("afsdfasdafsdfasd", gameName);
+    localStorage.setItem(`dart`, JSON.stringify(gameTable));
+  };
+  const loadPreviousGame = () => {
+    let retrievedObject = localStorage.getItem("dart");
+
+    console.log("retrievedObject: ", JSON.parse(retrievedObject));
+
+    let prevGameTable = JSON.parse(retrievedObject);
+    if (prevGameTable !== null) {
+      setGameTable(prevGameTable);
+
+      let newplayerData = prevGameTable?.players[0];
+      setPlayerId(newplayerData.id);
+
+      myRemaningPoint(newplayerData.points);
+
+      setPlayerData(newplayerData);
+
+      setStartForm(false);
+    } else {
+      handleSnakbarOpen("No data found", "error");
+    }
+  };
+  const list = (anchor) => (
+    <Box
+      sx={{ width: anchor === "top" || anchor === "bottom" ? "auto" : 250 }}
+      role="presentation"
+      onClick={toggleDrawer(anchor, false)}
+      onKeyDown={toggleDrawer(anchor, false)}
+    >
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton onClick={loadPreviousGame} color="primary">
+            <ListItemIcon style={{ minWidth: "40px" }}>
+              <DataUsageIcon style={{ color: "#1A5276" }} />
+            </ListItemIcon>
+            <ListItemText
+              style={{ color: "#1A5276" }}
+              primary={"Load Last Game"}
+            />
+          </ListItemButton>
+        </ListItem>
+      </List>
+    </Box>
+  );
   return (
     <div>
       {startForm ? (
@@ -221,9 +285,39 @@ const Board = () => {
               "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px",
           }}
         >
-          <h2 style={{ marginTop: 0 }} onClick={check}>
-            Dart
-          </h2>
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="center"
+            style={{ marginBottom: 20 }}
+          >
+            <Grid item xs={6}>
+              <h2 style={{ margin: 0 }} onClick={check}>
+                Dart{" "}
+              </h2>
+            </Grid>
+            <Grid item xs={6} style={{ textAlign: "right" }}>
+              <div>
+                {["right"].map((anchor) => (
+                  <React.Fragment key={anchor}>
+                    <IconButton onClick={toggleDrawer(anchor, true)}>
+                      <MenuIcon
+                        style={{ fontSize: "36px", color: "#1A5276" }}
+                      />
+                    </IconButton>
+                    <Drawer
+                      anchor={anchor}
+                      open={state[anchor]}
+                      onClose={toggleDrawer(anchor, false)}
+                    >
+                      {list(anchor)}
+                    </Drawer>
+                  </React.Fragment>
+                ))}
+              </div>
+            </Grid>
+          </Grid>
+
           {gameNameError && (
             <p style={{ color: "red", marginTop: 0 }}>Please enter game name</p>
           )}
