@@ -132,7 +132,7 @@ const Board = () => {
     console.log("remainingPoint", remainingPoint);
     if (remainingPoint < parseInt(playerPoint)) {
       return handleSnakbarOpen(
-        "your point is bigger than remaining point",
+        "your point is greater than remaining point",
         "error"
       );
     }
