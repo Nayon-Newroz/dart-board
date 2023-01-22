@@ -41,6 +41,8 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import DataUsageIcon from "@mui/icons-material/DataUsage";
 import MenuIcon from "@mui/icons-material/Menu";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import StopIcon from "@mui/icons-material/Stop";
 const Board = () => {
   const [gameName, setGameName] = useState("");
   const [gamePoint, setGamePoint] = useState(101);
@@ -53,6 +55,7 @@ const Board = () => {
   const [totalPoint, setTotalPoint] = useState(0);
   const [playerPoint, setPlayerPoint] = useState();
   const [gameNameError, setGameNameError] = useState(false);
+  const [gamePointError, setGamePointError] = useState(false);
   const [playersError, setplayersError] = useState(false);
   const [gameTable, setGameTable] = useState({
     gameName: "",
@@ -96,6 +99,16 @@ const Board = () => {
     let newplayerData = gameTable?.players?.find(
       (res) => res.id === event.target.value
     );
+
+    myRemaningPoint(newplayerData.points);
+    console.log("newplayerData", newplayerData);
+    console.log("playerData.id", playerData.id);
+
+    setPlayerData(newplayerData);
+  };
+  const handleChange2 = (id) => {
+    setPlayerId(id);
+    let newplayerData = gameTable?.players?.find((res) => res.id === id);
 
     myRemaningPoint(newplayerData.points);
     console.log("newplayerData", newplayerData);
@@ -171,6 +184,9 @@ const Board = () => {
   const startGame = () => {
     if (gameName.trim().length < 1) {
       return setGameNameError(true);
+    }
+    if (gamePoint.length < 1) {
+      return setGamePointError(true);
     }
     if (gameTable?.players.length < 1) {
       return setplayersError(true);
@@ -271,6 +287,18 @@ const Board = () => {
       </List>
     </Box>
   );
+  const fnTotalPoints = (item) => {
+    console.log("item", item);
+    let totalPoints = 0;
+    if (item.points.length > 0) {
+      item.points?.map((point) => {
+        totalPoints = totalPoints + parseInt(point);
+      });
+    }
+    console.log("totalPoints", totalPoints);
+    return totalPoints;
+  };
+
   return (
     <div>
       {startForm ? (
@@ -332,6 +360,11 @@ const Board = () => {
             value={gameName}
             onChange={(e) => setGameName(e.target.value)}
           />
+          {gamePointError && (
+            <p style={{ color: "red", marginTop: 0 }}>
+              Please enter game point
+            </p>
+          )}
           <TextField
             style={{ marginBottom: "20px" }}
             id="outlined-basic"
@@ -430,7 +463,7 @@ const Board = () => {
           style={{
             padding: "20px",
             background: "#fff",
-            marginTop: "30px",
+            // marginTop: "30px",
             borderRadius: "8px",
             boxShadow:
               "rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px",
@@ -446,55 +479,26 @@ const Board = () => {
             >
               New Game
             </Button>
-            {/* &nbsp; &nbsp;
-            <Button
-              disableElevation
-              variant="outlined"
-              color="secondary"
-              size="small"
-              onClick={() => {
-                localStorage.setItem(
-                  `${gameTable?.gameName}`,
-                  JSON.stringify(gameTable)
-                );
-              }}
-            >
-              Save Score
-            </Button>
-            &nbsp; &nbsp;
-            <Button
-              disableElevation
-              variant="outlined" 
-              size="small"
-              onClick={() => {
-                let retrievedObject = localStorage.getItem(
-                  `${gameTable?.gameName}`
-                );
 
-                console.log("retrievedObject: ", JSON.parse(retrievedObject));
-              }}
-            >
-              Load Score
-            </Button> */}
             <br />
             <br />
           </div>
           <Grid container alignItems="center">
             <Grid item xs={6}>
-              <h3 style={{ marginTop: 0, color: "#1A5276" }} onClick={check}>
+              <h3 style={{ margin: 0, color: "#1A5276" }} onClick={check}>
                 {gameTable?.gameName}
               </h3>
             </Grid>
             <Grid item xs={6}>
               <h3
-                style={{ marginTop: 0, textAlign: "right", color: "#9b9b9b" }}
+                style={{ margin: 0, textAlign: "right", color: "#9b9b9b" }}
                 onClick={check}
               >
                 Game Point : {gameTable?.gamePoint}
               </h3>
             </Grid>
           </Grid>
-
+          <br />
           {/* <FormControl fullWidth style={{ marginBottom: "20px" }}>
             <InputLabel id="demo-simple-select-label">Player</InputLabel>
             <Select
@@ -511,7 +515,117 @@ const Board = () => {
               ))}
             </Select>
           </FormControl> */}
-          <FormControl>
+          <TableContainer
+            style={{ border: "1px solid #ddd", borderRadius: "4px" }}
+          >
+            <Table
+              // sx={{ minWidth: 650 }}
+              size="small"
+              aria-label="a dense table"
+            >
+              <TableHead style={{ background: "#1a5276", color: "#fff" }}>
+                <TableRow>
+                  <TableCell style={{ color: "#fff", fontSize: "11px" }}>
+                    Player Name
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    style={{
+                      width: "60px",
+                      paddingLeft: "0px",
+                      color: "#fff",
+                      fontSize: "11px",
+                    }}
+                  >
+                    Obtained
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    style={{
+                      width: "60px",
+                      paddingLeft: "0px",
+                      color: "#fff",
+                      fontSize: "11px",
+                    }}
+                  >
+                    Remaining
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {gameTable?.players?.map((item, i) => (
+                  <TableRow
+                    key={i}
+                    // onClick={handleChange}
+                    onClick={() => {
+                      handleChange2(item.id);
+                    }}
+                    sx={{
+                      "&:last-child td, &:last-child th": { border: 0 },
+                      cursor: "pointer",
+                      // background: playerId === item.id ? "red" : "",
+                    }}
+                  >
+                    <TableCell
+                      style={{
+                        position: "relative",
+                        paddingLeft: "40px",
+                      }}
+                    >
+                      {playerId === item.id ? (
+                        <PlayArrowIcon
+                          style={{
+                            color: "#1a5276",
+                            fontSize: "20px",
+                            position: "absolute",
+                            left: "10px",
+                          }}
+                        />
+                      ) : (
+                        <StopIcon
+                          style={{
+                            color: "#ddd",
+                            fontSize: "20px",
+                            position: "absolute",
+                            left: "10px",
+                          }}
+                        />
+                      )}{" "}
+                      {item.name}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      style={{
+                        background: "lightseagreen",
+                        color: "#fff",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {fnTotalPoints(item)}
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      style={{
+                        background: "#b34b4b",
+                        color: "#fff",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {gameTable?.gamePoint - fnTotalPoints(item)}
+                    </TableCell>
+                  </TableRow>
+                  // <FormControlLabel
+                  //   key={i}
+                  //   value={item.id}
+                  //   control={<Radio />}
+                  //   label={item.name}
+                  // />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <br />
+          {/* <FormControl>
             <FormLabel id="demo-row-radio-buttons-group-label">
               Players
             </FormLabel>
@@ -531,9 +645,9 @@ const Board = () => {
                 />
               ))}
             </RadioGroup>
-          </FormControl>
+          </FormControl> */}
 
-          <Grid container alignItems="center">
+          {/* <Grid container alignItems="center">
             <Grid item xs={6}>
               <h4 style={{ marginTop: 0, color: "#9b9b9b" }} onClick={check}>
                 Total Point : {totalPoint}
@@ -548,7 +662,7 @@ const Board = () => {
                 <span style={{ color: "#1A5276" }}>{remainingPoint}</span>
               </h4>
             </Grid>
-          </Grid>
+          </Grid> */}
 
           <FormControl
             variant="outlined"
@@ -557,6 +671,7 @@ const Board = () => {
           >
             <InputLabel htmlFor="outlined-adornment-password">Point</InputLabel>
             <OutlinedInput
+              // size="small"
               id="outlined-adornment-password"
               type="number"
               endAdornment={
@@ -578,36 +693,65 @@ const Board = () => {
               onChange={(e) => setPlayerPoint(e.target.value)}
             />
           </FormControl>
-          <h3 style={{ marginTop: 0, color: "#9b9b9b" }} onClick={check}>
-            Point Summary
-          </h3>
-
-          <Table
-            aria-label="simple table"
-            size="small"
-            style={{ border: "1px solid #ddd" }}
-          >
-            <TableBody>
+          {playerData?.points?.length > 0 && (
+            <div>
+              <h3
+                style={{ marginTop: 0, color: "#9b9b9b", fontSize: "12px" }}
+                onClick={check}
+              >
+                Point Summary
+              </h3>
               {playerData?.points?.map((item, i) => (
-                <TableRow
-                  key={i}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell style={{ fontSize: "18px", fontWeight: "bold" }}>
+                <>
+                  <Button
+                    key={i}
+                    variant="outlined"
+                    onClick={() => deletePoint(item, i)}
+                    endIcon={
+                      <DeleteOutlineOutlinedIcon
+                        color="error"
+                        style={{ fontSize: "15px" }}
+                      />
+                    }
+                  >
                     {item}
-                  </TableCell>
-                  <TableCell align="right">
-                    {/* <IconButton>
+                  </Button>
+                  &nbsp;
+                </>
+              ))}
+              <Table
+                aria-label="simple table"
+                size="small"
+                style={{ border: "1px solid #ddd", display: "none" }}
+              >
+                <TableBody>
+                  {playerData?.points?.map((item, i) => (
+                    <TableRow
+                      key={i}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell
+                        style={{ fontSize: "12px", fontWeight: "bold" }}
+                      >
+                        {item}
+                      </TableCell>
+                      <TableCell align="right">
+                        {/* <IconButton>
                       <ModeEditOutlineOutlinedIcon />
                     </IconButton> */}
-                    <IconButton onClick={() => deletePoint(item, i)}>
-                      <DeleteOutlineOutlinedIcon color="error" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                        <IconButton onClick={() => deletePoint(item, i)}>
+                          <DeleteOutlineOutlinedIcon
+                            color="error"
+                            style={{ fontSize: "20px" }}
+                          />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </div>
       )}
     </div>
